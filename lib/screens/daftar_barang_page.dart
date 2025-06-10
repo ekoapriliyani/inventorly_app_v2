@@ -1,50 +1,43 @@
 import 'package:flutter/material.dart';
 import '../models/barang.dart';
-import '../data/dummy_data.dart';
-import 'tambah_barang_page.dart';
+import '../helpers/db_helper.dart';
 
-class DaftarBarangPage extends StatefulWidget {
-  @override
-  _DaftarBarangPageState createState() => _DaftarBarangPageState();
-}
-
-class _DaftarBarangPageState extends State<DaftarBarangPage> {
-  List<Barang> barangList = List.from(
-    dummyBarang,
-  ); // Duplikasi agar bisa dimodifikasi
-
-  void _navigateToTambahBarang() async {
-    final Barang? barangBaru = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => TambahBarangPage()),
-    );
-
-    if (barangBaru != null) {
-      setState(() {
-        barangList.add(barangBaru);
-      });
-    }
-  }
+class DaftarBarangPage extends StatelessWidget {
+  const DaftarBarangPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Daftar Barang')),
-      body: ListView.builder(
-        itemCount: barangList.length,
-        itemBuilder: (context, index) {
-          final item = barangList[index];
-          return ListTile(
-            title: Text(item.nama),
-            subtitle: Text(
-              'Kode: ${item.kode} | Qty: ${item.qty} | ${item.kategori}',
-            ),
-          );
+      appBar: AppBar(title: const Text('Daftar Barang')),
+      body: FutureBuilder<List<Barang>>(
+        future: DBHelper.getAllBarang(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Belum ada barang'));
+          } else {
+            final barangList = snapshot.data!;
+            return ListView.builder(
+              itemCount: barangList.length,
+              itemBuilder: (context, index) {
+                final item = barangList[index];
+                return ListTile(
+                  title: Text(item.nama),
+                  subtitle: Text('Kode: ${item.kode} | Qty: ${item.qty}'),
+                );
+              },
+            );
+          }
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToTambahBarang,
-        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.pushNamed(context, '/tambah-barang');
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

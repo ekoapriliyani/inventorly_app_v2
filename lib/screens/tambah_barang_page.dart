@@ -8,20 +8,18 @@ class TambahBarangPage extends StatefulWidget {
 
 class _TambahBarangPageState extends State<TambahBarangPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _kodeController = TextEditingController();
-  final TextEditingController _namaController = TextEditingController();
-  final TextEditingController _kategoriController = TextEditingController();
-  final TextEditingController _qtyController = TextEditingController();
+  final _kodeController = TextEditingController();
+  final _namaController = TextEditingController();
+  final _qtyController = TextEditingController();
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      final barangBaru = Barang(
+      final barang = Barang(
         kode: _kodeController.text.trim(),
         nama: _namaController.text.trim(),
-        kategori: _kategoriController.text.trim(),
         qty: int.parse(_qtyController.text.trim()),
       );
-      Navigator.pop(context, barangBaru);
+      Navigator.pop(context, barang);
     }
   }
 
@@ -29,7 +27,6 @@ class _TambahBarangPageState extends State<TambahBarangPage> {
   void dispose() {
     _kodeController.dispose();
     _namaController.dispose();
-    _kategoriController.dispose();
     _qtyController.dispose();
     super.dispose();
   }
@@ -42,7 +39,7 @@ class _TambahBarangPageState extends State<TambahBarangPage> {
         padding: EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: [
               TextFormField(
                 controller: _kodeController,
@@ -51,7 +48,6 @@ class _TambahBarangPageState extends State<TambahBarangPage> {
                     (value) =>
                         value == null || value.isEmpty ? 'Wajib diisi' : null,
               ),
-              SizedBox(height: 16),
               TextFormField(
                 controller: _namaController,
                 decoration: InputDecoration(labelText: 'Nama Barang'),
@@ -59,15 +55,6 @@ class _TambahBarangPageState extends State<TambahBarangPage> {
                     (value) =>
                         value == null || value.isEmpty ? 'Wajib diisi' : null,
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _kategoriController,
-                decoration: InputDecoration(labelText: 'Kategori Barang'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty ? 'Wajib diisi' : null,
-              ),
-              SizedBox(height: 16),
               TextFormField(
                 controller: _qtyController,
                 decoration: InputDecoration(labelText: 'Qty'),
@@ -78,7 +65,7 @@ class _TambahBarangPageState extends State<TambahBarangPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 24),
               ElevatedButton(onPressed: _submitForm, child: Text('Simpan')),
             ],
           ),
